@@ -40,6 +40,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { addMemory, compressDeterministic, computeStats, exportJson, formatSearchResults, loadStore, purge, search, softDeleteById } from "./memoryStore.js";
 import { deepSeekCompress, deepSeekShape } from "./deepseek.js";
+import { createConfigManager, ConfigManager } from "./config.js";
 
 /**
  * Logs a message to stderr (stdout is reserved for JSON-RPC).
@@ -286,10 +287,11 @@ server.registerTool(
     let md = det.markdown;
 
     if (llm) {
-      const key = (process.env.DEEPSEEK_API_KEY || "").trim();
+      const configManager = createConfigManager();
+      const key = configManager.getDeepSeekApiKey();
       if (key) {
-        const baseUrl = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").trim();
-        const model = (process.env.DEEPSEEK_MODEL || "deepseek-chat").trim();
+        const baseUrl = configManager.getDeepSeekBaseUrl();
+        const model = configManager.getDeepSeekModel();
         md = await deepSeekCompress({ baseUrl, apiKey: key, model }, query, md, budget);
       }
     }
@@ -560,10 +562,11 @@ server.registerTool(
     let shapingMethod = "deterministic";
 
     // Attempt DeepSeek shaping for intelligent context transformation
-    const apiKey = (process.env.DEEPSEEK_API_KEY || "").trim();
+    const configManager = createConfigManager();
+    const apiKey = configManager.getDeepSeekApiKey();
     if (apiKey) {
-      const baseUrl = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").trim();
-      const model = (process.env.DEEPSEEK_MODEL || "deepseek-chat").trim();
+      const baseUrl = configManager.getDeepSeekBaseUrl();
+      const model = configManager.getDeepSeekModel();
       try {
         contextBlock = await deepSeekShape({ baseUrl, apiKey, model }, task, compressed.markdown, budget);
         shapingMethod = "deepseek";
@@ -825,10 +828,11 @@ server.registerPrompt(
 
     // If shaping is requested and DeepSeek is configured, transform the context
     if (shape) {
-      const key = (process.env.DEEPSEEK_API_KEY || "").trim();
+      const configManager = createConfigManager();
+      const key = configManager.getDeepSeekApiKey();
       if (key) {
-        const baseUrl = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").trim();
-        const model = (process.env.DEEPSEEK_MODEL || "deepseek-chat").trim();
+        const baseUrl = configManager.getDeepSeekBaseUrl();
+        const model = configManager.getDeepSeekModel();
         try {
           contextBlock = await deepSeekShape({ baseUrl, apiKey: key, model }, task, compressed.markdown, budget);
           shapingNote = " (AI-shaped)";

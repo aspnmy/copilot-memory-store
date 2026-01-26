@@ -134,6 +134,127 @@ Once you have installed the copilot-memory-store, follow these steps to begin us
 
 For detailed documentation about commands and features, check the [Wiki](https://github.com/Tokio17/copilot-memory-store/wiki). This resource includes examples and advanced tips to enhance your experience.
 
+## 🔄 Memory Migration & Backup Features
+
+Copilot Memory Store provides comprehensive memory migration and automatic backup features.
+
+### Memory Migration
+
+You can export memories in multiple formats for use in other models/tools:
+
+**Supported Export Formats:**
+- JSON - Complete data structure for programmatic processing
+- Markdown - Human-readable document format
+- CSV - Tabular data for Excel and other tools
+- Plain Text - Simple text format
+- Embedding Ready - For LLM embedding and semantic search
+
+**Export Commands:**
+```bash
+# Export as JSON (default)
+npm run memory:export
+
+# Export as Markdown
+npm run memory:export:md
+
+# Export as CSV
+npm run memory:export:csv
+
+# Export as plain text
+npm run memory:export:text
+
+# Export as embedding ready format
+npm run memory:export:embedding
+```
+
+**Import Commands:**
+```bash
+# Import from default file
+npm run memory:import
+
+# Import from specific file
+npx tsx src/import-memories.ts path/to/export-file.json
+```
+
+### Automatic Backup
+
+Copilot Memory Store provides automatic backup functionality to regularly backup memory data.
+
+**Configure Automatic Backup:**
+
+Add the following configuration to your `.env` file:
+
+```env
+# Backup interval in milliseconds, default 3600000 (1 hour)
+BACKUP_INTERVAL=3600000
+
+# Backup format, supports: json, markdown, csv, plain_text, embedding_ready, default json
+BACKUP_FORMAT=json
+
+# Backup directory, default ./backups
+BACKUP_DIR=./backups
+
+# Maximum number of backups, default 10
+MAX_BACKUPS=10
+
+# Whether to compress backup files, default false
+COMPRESS_BACKUPS=false
+```
+
+**Automatic Backup Commands:**
+
+```bash
+# Start automatic backup service (continuous, periodic backups)
+npm run backup:auto
+
+# Perform a one-time backup
+npm run backup:once
+```
+
+**Automatic Backup Features:**
+
+- **Scheduled Backup:** Automatically backup memory data at configured intervals
+- **Multi-format Support:** Supports JSON, Markdown, CSV, plain text, and embedding ready formats
+- **Auto Cleanup:** Automatically deletes old backup files exceeding the maximum backup count
+- **Graceful Shutdown:** Supports Ctrl+C to gracefully stop the backup service
+- **Detailed Logging:** Provides detailed backup operation logs
+
+**Usage Scenarios:**
+
+**Scenario 1: Development Environment Auto Backup**
+```bash
+# Start automatic backup service in development environment
+npm run backup:auto
+```
+
+**Scenario 2: Production Environment Scheduled Backup**
+```bash
+# Use cron or Windows Task Scheduler to periodically perform one-time backups
+npm run backup:once
+```
+
+**Scenario 3: Backup Before Important Operations**
+```bash
+# Manually perform backup before executing important operations
+npm run backup:once
+```
+
+**Backup File Naming:**
+
+Backup files use the following naming format:
+```
+memory-backup-YYYY-MM-DDTHH-MM-SS-sssZ.<extension>
+```
+
+Example:
+```
+memory-backup-2026-01-27T10-30-45-123Z.json
+```
+
+**Detailed Documentation:**
+
+For detailed documentation about memory migration and backup features, please refer to the [Memory Migration Guide](docs/MEMORY_MIGRATION_GUIDE.md).
+
 ## 🤝 Community & Support
 
 Join our community to ask questions, share insights, and learn more about context engineering. You can reach out through the following channels:

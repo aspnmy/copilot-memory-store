@@ -49,6 +49,7 @@ memories-export-*.md
 memories-export-*.csv
 memories-export-*.txt
 memories-export-*.jsonl
+backups/
 
 ############################
 # Shared editor configuration to keep

@@ -39,7 +39,9 @@
     "memory:export:csv": "npx tsx src/migrate-memories.ts csv",
     "memory:export:text": "npx tsx src/migrate-memories.ts text",
     "memory:export:embedding": "npx tsx src/migrate-memories.ts embedding",
-    "memory:import": "npx tsx src/import-memories.ts"
+    "memory:import": "npx tsx src/import-memories.ts",
+    "backup:auto": "npx tsx src/auto-backup.ts",
+    "backup:once": "npx tsx src/auto-backup.ts --once"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.0",

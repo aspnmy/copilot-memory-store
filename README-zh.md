@@ -287,6 +287,69 @@ npm run memory:export:csv
 4. **数据验证**：导入后验证数据的完整性和准确性
 5. **错误处理**：检查导入日志，确保所有记忆都被正确处理
 
+### 自动备份功能
+
+Copilot Memory Store 提供了自动备份功能，可以定期自动备份记忆数据。
+
+#### 配置自动备份
+
+在 `.env` 文件中添加以下配置：
+
+```env
+# 备份间隔（毫秒），默认 3600000（1小时）
+BACKUP_INTERVAL=3600000
+
+# 备份格式，支持：json, markdown, csv, plain_text, embedding_ready，默认 json
+BACKUP_FORMAT=json
+
+# 备份目录，默认 ./backups
+BACKUP_DIR=./backups
+
+# 最大备份数，默认 10
+MAX_BACKUPS=10
+
+# 是否压缩备份文件，默认 false
+COMPRESS_BACKUPS=false
+```
+
+#### 自动备份命令
+
+```bash
+# 启动自动备份服务（持续运行，定期备份）
+npm run backup:auto
+
+# 执行一次性备份
+npm run backup:once
+```
+
+#### 自动备份特性
+
+- **定时备份**：按照配置的间隔自动备份记忆数据
+- **多格式支持**：支持 JSON、Markdown、CSV、纯文本和嵌入向量准备格式
+- **自动清理**：自动删除超过最大备份数的旧备份文件
+- **优雅停止**：支持 Ctrl+C 优雅停止备份服务
+- **详细日志**：提供详细的备份操作日志
+
+#### 使用场景
+
+**场景 1：开发环境自动备份**
+```bash
+# 在开发环境中启动自动备份服务
+npm run backup:auto
+```
+
+**场景 2：生产环境定时备份**
+```bash
+# 使用 cron 或 Windows 任务计划程序定期执行一次性备份
+npm run backup:once
+```
+
+**场景 3：重要操作前备份**
+```bash
+# 在执行重要操作前手动执行备份
+npm run backup:once
+```
+
 ### 详细文档
 
 有关记忆移植功能的详细文档，请查看 [记忆移植指南](docs/MEMORY_MIGRATION_GUIDE.md)。
