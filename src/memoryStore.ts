@@ -313,7 +313,7 @@ export async function purge(opts: { memoryPath?: string; id?: string; match?: st
   try {
     const records = readJsonArray(mp);
 
-    let predicate: (r: MemoryRecord) => boolean;
+    let predicate: (_: MemoryRecord) => boolean;
     if (id) predicate = (r) => r.id === id;
     else if (tag) predicate = (r) => r.tags.map((t) => t.toLowerCase()).includes(tag);
     else {

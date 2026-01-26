@@ -5,19 +5,35 @@
   "type": "module",
   "description": "Local JSON memory store with CLI + MCP server for GitHub Copilot / MCP clients.",
   "license": "MIT",
+  "bin": {
+    "copilot-memory-store": "dist/cli.js",
+    "copilot-memory-mcp": "dist/mcp-server.js",
+    "copilot-memory-trae": "dist/trae-mcp-server.js"
+  },
   "scripts": {
     "dev": "tsx src/cli.ts",
     "start": "tsx src/cli.ts",
     "mcp": "tsx src/mcp-server.ts",
+    "trae": "tsx src/trae-mcp-server.ts",
     "build": "tsc -p tsconfig.json",
     "start:dist": "node dist/cli.js",
     "mcp:dist": "node dist/mcp-server.js",
+    "trae:dist": "node dist/trae-mcp-server.js",
     "inspect": "npx @modelcontextprotocol/inspector node dist/mcp-server.js",
     "inspect:dev": "npx @modelcontextprotocol/inspector tsx src/mcp-server.ts",
+    "inspect:trae": "npx @modelcontextprotocol/inspector node dist/trae-mcp-server.js",
+    "inspect:trae:dev": "npx @modelcontextprotocol/inspector tsx src/trae-mcp-server.ts",
     "clean": "node -e \"import('fs').then(fs=>fs.rmSync('dist',{recursive:true,force:true}))\"",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "audit": "npm audit --audit-level=moderate"
+    "audit": "npm audit --audit-level=moderate",
+    "pkg:cli:gcc": "set PATH=E:\\nasm;%PATH% && set CC=E:\\V-pan-FIX\\D-pan\\mingw64\\bin\\gcc.exe && set CXX=E:\\V-pan-FIX\\D-pan\\mingw64\\bin\\g++.exe && pkg dist/cli.js --build --targets node16-win-x64 --output bin/copilot-memory-store.exe",
+    "pkg:mcp:gcc": "set PATH=E:\\nasm;%PATH% && set CC=E:\\V-pan-FIX\\D-pan\\mingw64\\bin\\gcc.exe && set CXX=E:\\V-pan-FIX\\D-pan\\mingw64\\bin\\g++.exe && pkg dist/mcp-server.js --build --targets node16-win-x64 --output bin/copilot-memory-mcp.exe",
+    "pkg:trae:gcc": "set PATH=E:\\nasm;%PATH% && set CC=E:\\V-pan-FIX\\D-pan\\mingw64\\bin\\gcc.exe && set CXX=E:\\V-pan-FIX\\D-pan\\mingw64\\bin\\g++.exe && pkg dist/trae-mcp-server.js --build --targets node16-win-x64 --output bin/copilot-memory-trae.exe",
+    "pkg:all:gcc": "npm run build && npm run pkg:cli:gcc && npm run pkg:mcp:gcc && npm run pkg:trae:gcc",
+    "pkg:clean": "node -e \"import('fs').then(fs=>fs.rmSync('bin',{recursive:true,force:true}))\"",
+    "create:bat": "node -e \"import('fs').then(fs=>{fs.mkdirSync('bin',{recursive:true});fs.writeFileSync('bin/copilot-memory-store.bat','@echo off\\nnode %~dp0/../dist/cli.js %*');fs.writeFileSync('bin/copilot-memory-mcp.bat','@echo off\\nnode %~dp0/../dist/mcp-server.js %*');console.log('Created batch files in bin/ directory');})\"",
+    "create:bat:trae": "node -e \"import('fs').then(fs=>{fs.mkdirSync('bin',{recursive:true});fs.writeFileSync('bin/copilot-memory-trae.bat','@echo off\\nnode %~dp0/../dist/trae-mcp-server.js %*');console.log('Created trae batch file in bin/ directory');})\""
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.0",
@@ -30,6 +46,8 @@
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
     "eslint": "^9.39.2",
+    "nexe": "^5.0.0-beta.4",
+    "pkg": "^5.8.1",
     "sharp": "^0.34.5",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
