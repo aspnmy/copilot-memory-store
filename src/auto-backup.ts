@@ -8,6 +8,26 @@ import path from "node:path";
  * 定期自动备份记忆数据到指定目录
  */
 
+/**
+ * Returns current time as ISO string in Shanghai timezone (UTC+8)
+ */
+function nowIso(): string {
+  const now = new Date();
+  const offset = 8; // Shanghai timezone UTC+8
+  const localTime = new Date(now.getTime() + (offset * 60 * 60 * 1000));
+  
+  // Manually format to avoid UTC conversion
+  const year = localTime.getFullYear();
+  const month = String(localTime.getMonth() + 1).padStart(2, "0");
+  const day = String(localTime.getDate()).padStart(2, "0");
+  const hours = String(localTime.getHours()).padStart(2, "0");
+  const minutes = String(localTime.getMinutes()).padStart(2, "0");
+  const seconds = String(localTime.getSeconds()).padStart(2, "0");
+  const ms = String(localTime.getMilliseconds()).padStart(3, "0");
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}+08:00`;
+}
+
 type MemoryRecord = {
   id: string;
   text: string;
@@ -85,7 +105,7 @@ function exportToJson(records: MemoryRecord[]): string {
 function exportToMarkdown(records: MemoryRecord[]): string {
   const lines: string[] = [];
   lines.push("# 记忆导出\n");
-  lines.push(`导出时间: ${new Date().toISOString()}`);
+  lines.push(`导出时间: ${nowIso()}`);
   lines.push(`总记忆数: ${records.length}\n`);
   
   for (const record of records) {
@@ -242,14 +262,19 @@ async function performBackup(config: BackupConfig): Promise<void> {
     
     const content = exportMemories(activeRecords, config.format);
     const extension = getFileExtension(config.format);
+    
+    // Use Shanghai timezone for backup filename
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-    const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
+    const offset = 8; // Shanghai timezone UTC+8
+    const localTime = new Date(now.getTime() + (offset * 60 * 60 * 1000));
+    
+    const year = localTime.getFullYear();
+    const month = String(localTime.getMonth() + 1).padStart(2, "0");
+    const day = String(localTime.getDate()).padStart(2, "0");
+    const hours = String(localTime.getHours()).padStart(2, "0");
+    const minutes = String(localTime.getMinutes()).padStart(2, "0");
+    const seconds = String(localTime.getSeconds()).padStart(2, "0");
+    const milliseconds = String(localTime.getMilliseconds()).padStart(3, "0");
     const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}${milliseconds}`;
     const filename = `memory-backup-${timestamp}.${extension}`;
     const backupPath = path.join(config.backupDir, filename);

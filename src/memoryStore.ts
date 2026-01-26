@@ -78,14 +78,40 @@ export type CompressResult = {
 const DEFAULT_MEMORY_PATH = ".copilot-memory.json";
 const DEFAULT_LOCK_NAME = ".copilot-memory.lock";
 
-/** Returns current time as ISO string */
+/** Returns current time as ISO string in Shanghai timezone (UTC+8) */
 function nowIso(): string {
-  return new Date().toISOString();
+  const now = new Date();
+  const offset = 8; // Shanghai timezone UTC+8
+  const localTime = new Date(now.getTime() + (offset * 60 * 60 * 1000));
+  
+  // Manually format to avoid UTC conversion
+  const year = localTime.getFullYear();
+  const month = String(localTime.getMonth() + 1).padStart(2, "0");
+  const day = String(localTime.getDate()).padStart(2, "0");
+  const hours = String(localTime.getHours()).padStart(2, "0");
+  const minutes = String(localTime.getMinutes()).padStart(2, "0");
+  const seconds = String(localTime.getSeconds()).padStart(2, "0");
+  const ms = String(localTime.getMilliseconds()).padStart(3, "0");
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${ms}+08:00`;
 }
 
-/** Generates a unique memory ID with timestamp and random suffix */
+/** Generates a unique memory ID with timestamp and random suffix (Shanghai timezone) */
 function makeId(): string {
-  const ts = new Date().toISOString().replace(/[:.]/g, "").replace(/-/g, "");
+  const now = new Date();
+  const offset = 8; // Shanghai timezone UTC+8
+  const localTime = new Date(now.getTime() + (offset * 60 * 60 * 1000));
+  
+  // Manually format to avoid UTC conversion
+  const year = localTime.getFullYear();
+  const month = String(localTime.getMonth() + 1).padStart(2, "0");
+  const day = String(localTime.getDate()).padStart(2, "0");
+  const hours = String(localTime.getHours()).padStart(2, "0");
+  const minutes = String(localTime.getMinutes()).padStart(2, "0");
+  const seconds = String(localTime.getSeconds()).padStart(2, "0");
+  const ms = String(localTime.getMilliseconds()).padStart(3, "0");
+  
+  const ts = `${year}${month}${day}T${hours}${minutes}${seconds}${ms}Z`;
   const rand = crypto.randomBytes(3).toString("hex");
   return `m_${ts}_${rand}`;
 }

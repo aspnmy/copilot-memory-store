@@ -345,6 +345,9 @@ async function handleLine(line: string, state: { memoryPath: string; records: an
  * Loads the memory store, displays status, and enters a readline loop
  * that processes commands until user types 'exit' or 'quit'.
  *
+ * If command line arguments are provided, executes them directly without
+ * entering interactive mode.
+ *
  * @example
  * ```
  * $ npm run dev
@@ -353,10 +356,27 @@ async function handleLine(line: string, state: { memoryPath: string; records: an
  *
  * memory> search typescript
  * ```
+ * 
+ * @example
+ * ```
+ * $ node dist/cli.js add --tags gmem,preference "test memory"
+ * ✅ Added m_20260127T123456789Z_abc123
+ * ```
  */
 export async function main(): Promise<void> {
   const loaded = loadStore();
   const active = loaded.records.filter((r: any) => !r.deletedAt).length;
+  
+  // Check if command line arguments are provided
+  const cliArgs = process.argv.slice(2);
+  if (cliArgs.length > 0) {
+    // Execute command directly without entering interactive mode
+    const line = cliArgs.join(" ");
+    await handleLine(line, { memoryPath: loaded.memoryPath, records: loaded.records });
+    return;
+  }
+  
+  // Interactive mode
   console.log(`📦 Loaded ${active} memories`);
   console.log(`Type "help" for available commands, "exit" to quit.\n`);
 
