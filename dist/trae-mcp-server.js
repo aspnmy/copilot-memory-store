@@ -1,21 +1,21 @@
 /**
- * @fileoverview MCP Server for Trae.
+ * @fileoverview MCP Server for Gmem.
  *
  * A Model Context Protocol server that provides integration between
- * Trae and the Copilot Memory Store. This server extends the existing
- * memory capabilities with Trae-specific features.
+ * Gmem and the Copilot Memory Store. This server extends the existing
+ * memory capabilities with Gmem-specific features.
  *
  * ## Tools
- * - trae_write: Add a memory with Trae-specific metadata
- * - trae_search: Search memories with Trae-specific filters
- * - trae_compress: Compress context for Trae tasks
- * - trae_inject_context: Auto-inject context for Trae tasks
+ * - gmem_write: Add a memory with Gmem-specific metadata
+ * - gmem_search: Search memories with Gmem-specific filters
+ * - gmem_compress: Compress context for Gmem tasks
+ * - gmem_inject_context: Auto-inject context for Gmem tasks
  *
  * ## Resources
- * - trae://stats: Statistics about Trae-specific memories
- * - trae://recent: Recent Trae memories
+ * - gmem://stats: Statistics about Gmem-specific memories
+ * - gmem://recent: Recent Gmem memories
  *
- * @module trae-mcp-server
+ * @module gmem-mcp-server
  * @version 0.1.0
  * @see https://modelcontextprotocol.io/
  */
@@ -32,62 +32,62 @@ import { createConfigManager } from "./config.js";
  * @param msg - Message to log
  */
 function log(msg) {
-    process.stderr.write(`[trae-memory] ${msg}\n`);
+    process.stderr.write(`[gmem-memory] ${msg}\n`);
 }
 /**
- * MCP server instance for Trae with name, version, and capabilities.
+ * MCP server instance for Gmem with name, version, and capabilities.
  *
- * This server provides integration between Trae and the memory store:
- * - Trae-specific memory operations
- * - Context compression for Trae tasks
- * - Trae-specific metadata support
+ * This server provides integration between Gmem and the memory store:
+ * - Gmem-specific memory operations
+ * - Context compression for Gmem tasks
+ * - Gmem-specific metadata support
  */
-const server = new McpServer({ name: "trae-memory-store", version: "0.1.0" }, {
+const server = new McpServer({ name: "gmem-memory-store", version: "0.1.0" }, {
     capabilities: {},
     instructions: `
-# Trae Memory Store
+# Gmem Memory Store
 
-A persistent memory system for Trae. Use this to remember decisions,
-preferences, patterns, and context across Trae interactions.
+A persistent memory system for Gmem. Use this to remember decisions,
+preferences, patterns, and context across Gmem interactions.
 
 ## Quick Start
-- **Save something**: Use \`trae_write\` with text and optional tags
-- **Find memories**: Use \`trae_search\` with a query
-- **Get context**: Use \`trae_inject_context\` before starting a Trae task
+- **Save something**: Use \`gmem_write\` with text and optional tags
+- **Find memories**: Use \`gmem_search\` with a query
+- **Get context**: Use \`gmem_inject_context\` before starting a Gmem task
 
 ## Best Practices
-- Tag memories for better organization (e.g., "trae", "decision", "preference")
-- Use \`trae_inject_context\` at the start of tasks to retrieve relevant context
-- Periodically review with \`trae://stats\` and \`trae://recent\` resources
+- Tag memories for better organization (e.g., "gmem", "decision", "preference")
+- Use \`gmem_inject_context\` at the start of tasks to retrieve relevant context
+- Periodically review with \`gmem://stats\` and \`gmem://recent\` resources
     `.trim()
 });
 // ─────────────────────────────────────────────────────────────
 // MCP Tools - actions clients can invoke
 // ─────────────────────────────────────────────────────────────
 /**
- * Tool: trae_write
+ * Tool: gmem_write
  *
- * Adds a new memory to the store with Trae-specific metadata.
+ * Adds a new memory to the store with Gmem-specific metadata.
  * Keywords are automatically extracted from the text for search indexing.
  *
  * @example
  * // Simple memory
- * trae_write({ text: "Use TypeScript strict mode", traeType: "preference" })
+ * gmem_write({ text: "Use TypeScript strict mode", gmemType: "preference" })
  *
  * // Memory with tags
- * trae_write({ text: "API uses REST conventions", tags: ["trae", "architecture", "api"], traeType: "decision" })
+ * gmem_write({ text: "API uses REST conventions", tags: ["gmem", "architecture", "api"], gmemType: "decision" })
  */
-server.registerTool("trae_write", {
-    title: "Write Trae Memory",
-    description: "Add, save, store, or remember information to the Trae memory. Use this when you want to remember something specific to Trae, save a preference, store a decision, or add a note for later.",
+server.registerTool("gmem_write", {
+    title: "Write Gmem Memory",
+    description: "Add, save, store, or remember information to the Gmem memory. Use this when you want to remember something specific to Gmem, save a preference, store a decision, or add a note for later.",
     inputSchema: {
         text: z.string().min(1).describe("The memory text to store. Be descriptive - this will be searchable later."),
-        tags: z.array(z.string()).optional().describe("Optional tags for categorization (e.g., 'trae', 'decision', 'preference', 'architecture'). Helps with organization and filtering."),
-        traeType: z.string().optional().describe("Trae-specific type (e.g., 'preference', 'decision', 'fact', 'emotional')."),
-        traeMetadata: z.record(z.string(), z.any()).optional().describe("Additional Trae-specific metadata.")
+        tags: z.array(z.string()).optional().describe("Optional tags for categorization (e.g., 'gmem', 'decision', 'preference', 'architecture'). Helps with organization and filtering."),
+        gmemType: z.string().optional().describe("Gmem-specific type (e.g., 'preference', 'decision', 'fact', 'emotional')."),
+        gmemMetadata: z.record(z.string(), z.any()).optional().describe("Additional Gmem-specific metadata.")
     },
     annotations: {
-        title: "Write Trae Memory",
+        title: "Write Gmem Memory",
         readOnlyHint: false,
         destructiveHint: false,
         idempotentHint: false,
@@ -96,47 +96,47 @@ server.registerTool("trae_write", {
 }, async (args) => {
     const text = String(args.text ?? "").trim();
     let tags = Array.isArray(args.tags) ? args.tags.map((t) => String(t)) : [];
-    // Add 'trae' tag if not already present
-    if (!tags.includes("trae")) {
-        tags.push("trae");
+    // Add 'gmem' tag if not already present
+    if (!tags.includes("gmem")) {
+        tags.push("gmem");
     }
-    // Add traeType to tags if provided
-    if (typeof args.traeType === "string" && args.traeType.trim()) {
-        tags.push(args.traeType.trim());
+    // Add gmemType to tags if provided
+    if (typeof args.gmemType === "string" && args.gmemType.trim()) {
+        tags.push(args.gmemType.trim());
     }
     const rec = await addMemory({ text, tags });
     const tagInfo = rec.tags.length > 0 ? ` with tags [${rec.tags.join(", ")}]` : "";
     return {
         content: [{
                 type: "text",
-                text: `✓ Memory saved for Trae (${rec.id})${tagInfo}\n\nKeywords extracted: ${rec.keywords.slice(0, 5).join(", ")}${rec.keywords.length > 5 ? "..." : ""}`
+                text: `✓ Memory saved for Gmem (${rec.id})${tagInfo}\n\nKeywords extracted: ${rec.keywords.slice(0, 5).join(", ")}${rec.keywords.length > 5 ? "..." : ""}`
             }]
     };
 });
 /**
- * Tool: trae_search
+ * Tool: gmem_search
  *
- * Searches memories by keyword query with relevance scoring, filtered for Trae-specific content.
+ * Searches memories by keyword query with relevance scoring, filtered for Gmem-specific content.
  *
  * @example
  * // Find architecture decisions
- * trae_search({ query: "architecture patterns" })
+ * gmem_search({ query: "architecture patterns" })
  *
  * // Get raw JSON for programmatic processing
- * trae_search({ query: "API design", raw: true, limit: 5 })
+ * gmem_search({ query: "API design", raw: true, limit: 5 })
  */
-server.registerTool("trae_search", {
-    title: "Search Trae Memories",
-    description: "Search, find, recall, or look up information from Trae memory. Filters results to include only Trae-related memories.",
+server.registerTool("gmem_search", {
+    title: "Search Gmem Memories",
+    description: "Search, find, recall, or look up information from Gmem memory. Filters results to include only Gmem-related memories.",
     inputSchema: {
         query: z.string().min(1).describe("Search query - matches against memory text, keywords, and tags."),
         limit: z.number().min(1).max(50).default(10).describe("Maximum results to return (1-50, default 10)."),
         raw: z.boolean().default(false).describe("Return raw JSON instead of formatted markdown. Useful for programmatic processing."),
-        traeType: z.string().optional().describe("Filter by Trae-specific type."),
-        includeNonTrae: z.boolean().default(false).describe("Include non-Trae memories in results.").default(false)
+        gmemType: z.string().optional().describe("Filter by Gmem-specific type."),
+        includeNonGmem: z.boolean().default(false).describe("Include non-Gmem memories in results.").default(false)
     },
     annotations: {
-        title: "Search Trae Memories",
+        title: "Search Gmem Memories",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
@@ -146,17 +146,17 @@ server.registerTool("trae_search", {
     const q = String(args.query ?? "").trim();
     const limit = Number.isFinite(args.limit) ? Number(args.limit) : 10;
     const raw = Boolean(args.raw);
-    const traeType = typeof args.traeType === "string" ? args.traeType.trim() : undefined;
-    const includeNonTrae = Boolean(args.includeNonTrae);
+    const gmemType = typeof args.gmemType === "string" ? args.gmemType.trim() : undefined;
+    const includeNonGmem = Boolean(args.includeNonGmem);
     const loaded = loadStore();
     let hits = search(loaded.records, q, limit * 2); // Get more results to filter
-    // Filter results for Trae-specific memories
-    if (!includeNonTrae) {
-        hits = hits.filter(hit => hit.tags.includes("trae"));
+    // Filter results for Gmem-specific memories
+    if (!includeNonGmem) {
+        hits = hits.filter(hit => hit.tags.includes("gmem"));
     }
-    // Filter by traeType if provided
-    if (traeType) {
-        hits = hits.filter(hit => hit.tags.includes(traeType));
+    // Filter by gmemType if provided
+    if (gmemType) {
+        hits = hits.filter(hit => hit.tags.includes(gmemType));
     }
     // Limit results
     hits = hits.slice(0, limit);
@@ -167,29 +167,29 @@ server.registerTool("trae_search", {
     return { content: [{ type: "text", text: formatted }] };
 });
 /**
- * Tool: trae_compress
+ * Tool: gmem_compress
  *
- * Creates a budget-constrained markdown context block from relevant Trae memories.
+ * Creates a budget-constrained markdown context block from relevant Gmem memories.
  *
  * @example
  * // Basic compression
- * trae_compress({ query: "testing strategy" })
+ * gmem_compress({ query: "testing strategy" })
  *
  * // With LLM enhancement
- * trae_compress({ query: "API design", llm: true, budget: 2000 })
+ * gmem_compress({ query: "API design", llm: true, budget: 2000 })
  */
-server.registerTool("trae_compress", {
-    title: "Compress Trae Context",
-    description: "Create a compact Markdown context block from relevant Trae memories, constrained to a character budget.",
+server.registerTool("gmem_compress", {
+    title: "Compress Gmem Context",
+    description: "Create a compact Markdown context block from relevant Gmem memories, constrained to a character budget.",
     inputSchema: {
-        query: z.string().min(1).describe("Search query to find relevant Trae memories."),
+        query: z.string().min(1).describe("Search query to find relevant Gmem memories."),
         budget: z.number().min(200).max(8000).default(1200).describe("Character budget for output (200-8000, default 1200)."),
         limit: z.number().min(1).max(50).default(25).describe("Max memories to consider before compression (1-50, default 25)."),
         llm: z.boolean().default(false).describe("Use DeepSeek LLM for smarter compression. Requires DEEPSEEK_API_KEY env var."),
-        includeNonTrae: z.boolean().default(false).describe("Include non-Trae memories in results.").default(false)
+        includeNonGmem: z.boolean().default(false).describe("Include non-Gmem memories in results.").default(false)
     },
     annotations: {
-        title: "Compress Trae Context",
+        title: "Compress Gmem Context",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
@@ -200,18 +200,18 @@ server.registerTool("trae_compress", {
     const budget = Number.isFinite(args.budget) ? Number(args.budget) : 1200;
     const limit = Number.isFinite(args.limit) ? Number(args.limit) : 25;
     const llm = Boolean(args.llm);
-    const includeNonTrae = Boolean(args.includeNonTrae);
+    const includeNonGmem = Boolean(args.includeNonGmem);
     const loaded = loadStore();
     let hits = search(loaded.records, query, limit * 2); // Get more results to filter
-    // Filter results for Trae-specific memories
-    if (!includeNonTrae) {
-        hits = hits.filter(hit => hit.tags.includes("trae"));
+    // Filter results for Gmem-specific memories
+    if (!includeNonGmem) {
+        hits = hits.filter(hit => hit.tags.includes("gmem"));
     }
     // Limit results
     hits = hits.slice(0, limit);
     // Create context from filtered hits
     const lines = [];
-    lines.push("# Trae Context (auto)");
+    lines.push("# Gmem Context (auto)");
     lines.push("");
     lines.push("## Relevant memories");
     for (const h of hits) {
@@ -231,29 +231,29 @@ server.registerTool("trae_compress", {
     return { content: [{ type: "text", text: md }] };
 });
 /**
- * Tool: trae_inject_context
+ * Tool: gmem_inject_context
  *
- * Automatically injects relevant Trae memories as shaped context for a task.
+ * Automatically injects relevant Gmem memories as shaped context for a task.
  *
  * @example
  * // Before implementing a feature
- * trae_inject_context({ task: "implement user authentication with OAuth", traeType: "decision" })
+ * gmem_inject_context({ task: "implement user authentication with OAuth", gmemType: "decision" })
  *
  * // With larger budget for complex tasks
- * trae_inject_context({ task: "refactor the database layer", budget: 3000 })
+ * gmem_inject_context({ task: "refactor the database layer", budget: 3000 })
  */
-server.registerTool("trae_inject_context", {
-    title: "Inject Trae Task Context",
-    description: "Inject relevant Trae context for a task. Call this BEFORE starting work to retrieve Trae-specific decisions, preferences, and constraints.",
+server.registerTool("gmem_inject_context", {
+    title: "Inject Gmem Task Context",
+    description: "Inject relevant Gmem context for a task. Call this BEFORE starting work to retrieve Gmem-specific decisions, preferences, and constraints.",
     inputSchema: {
         task: z.string().min(1).describe("The task you are about to work on. Be specific for better context matching."),
         budget: z.number().min(200).max(8000).default(1500).describe("Character budget for context output (200-8000, default 1500)."),
         limit: z.number().min(1).max(50).default(25).describe("Maximum memories to consider for context (1-50, default 25)."),
-        traeType: z.string().optional().describe("Filter by Trae-specific type."),
-        includeNonTrae: z.boolean().default(false).describe("Include non-Trae memories in context.").default(false)
+        gmemType: z.string().optional().describe("Filter by Gmem-specific type."),
+        includeNonGmem: z.boolean().default(false).describe("Include non-Gmem memories in context.").default(false)
     },
     annotations: {
-        title: "Inject Trae Task Context",
+        title: "Inject Gmem Task Context",
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
@@ -269,23 +269,23 @@ server.registerTool("trae_inject_context", {
     }
     const budget = Number.isFinite(args.budget) ? Number(args.budget) : 1500;
     const limit = Number.isFinite(args.limit) ? Number(args.limit) : 25;
-    const traeType = typeof args.traeType === "string" ? args.traeType.trim() : undefined;
-    const includeNonTrae = Boolean(args.includeNonTrae);
+    const gmemType = typeof args.gmemType === "string" ? args.gmemType.trim() : undefined;
+    const includeNonGmem = Boolean(args.includeNonGmem);
     const loaded = loadStore();
     let hits = search(loaded.records, task, limit * 2); // Get more results to filter
-    // Filter results for Trae-specific memories
-    if (!includeNonTrae) {
-        hits = hits.filter(hit => hit.tags.includes("trae"));
+    // Filter results for Gmem-specific memories
+    if (!includeNonGmem) {
+        hits = hits.filter(hit => hit.tags.includes("gmem"));
     }
-    // Filter by traeType if provided
-    if (traeType) {
-        hits = hits.filter(hit => hit.tags.includes(traeType));
+    // Filter by gmemType if provided
+    if (gmemType) {
+        hits = hits.filter(hit => hit.tags.includes(gmemType));
     }
     // Limit results
     hits = hits.slice(0, limit);
     // Create context from filtered hits
     const lines = [];
-    lines.push("# Trae Context (auto)");
+    lines.push("# Gmem Context (auto)");
     lines.push("");
     lines.push("## Relevant memories");
     for (const h of hits) {
@@ -317,32 +317,32 @@ server.registerTool("trae_inject_context", {
 // MCP Resources - data endpoints clients can fetch proactively
 // ─────────────────────────────────────────────────────────────
 /**
- * Resource: trae://stats
+ * Resource: gmem://stats
  *
- * Returns statistics about Trae-specific memories.
+ * Returns statistics about Gmem-specific memories.
  *
  * @returns Markdown table with statistics
  */
-server.registerResource("trae-stats", "trae://stats", {
-    description: "Statistics about Trae-specific memories. Shows counts and top tags by usage.",
+server.registerResource("gmem-stats", "gmem://stats", {
+    description: "Statistics about Gmem-specific memories. Shows counts and top tags by usage.",
     mimeType: "text/markdown"
 }, async () => {
     const loaded = loadStore();
-    // Filter for Trae-specific memories
-    const traeRecords = loaded.records.filter(r => r.tags.includes("trae"));
-    const s = computeStats(traeRecords);
+    // Filter for Gmem-specific memories
+    const gmemRecords = loaded.records.filter(r => r.tags.includes("gmem"));
+    const s = computeStats(gmemRecords);
     const lines = [];
-    lines.push("# Trae Memory Store Statistics\n");
-    lines.push("Real-time overview of your Trae memory store.\n");
+    lines.push("# Gmem Memory Store Statistics\n");
+    lines.push("Real-time overview of your Gmem memory store.\n");
     lines.push(`| Metric | Value |`);
     lines.push(`|--------|-------|`);
-    lines.push(`| Total Trae memories | ${s.total} |`);
+    lines.push(`| Total Gmem memories | ${s.total} |`);
     lines.push(`| Active | ${s.active} |`);
     lines.push(`| Soft-deleted | ${s.deleted} |`);
     const tagEntries = Object.entries(s.tags).sort((a, b) => b[1] - a[1]).slice(0, 10);
     if (tagEntries.length > 0) {
         lines.push("\n## Top 10 Tags\n");
-        lines.push("Most frequently used tags for Trae memories.\n");
+        lines.push("Most frequently used tags for Gmem memories.\n");
         lines.push(`| Tag | Usage Count |`);
         lines.push(`|-----|-------------|`);
         for (const [tag, count] of tagEntries) {
@@ -350,32 +350,32 @@ server.registerResource("trae-stats", "trae://stats", {
         }
     }
     else {
-        lines.push("\n_No tags in use yet. Add tags to Trae memories for better organization._");
+        lines.push("\n_No tags in use yet. Add tags to Gmem memories for better organization._");
     }
-    return { contents: [{ uri: "trae://stats", mimeType: "text/markdown", text: lines.join("\n") }] };
+    return { contents: [{ uri: "gmem://stats", mimeType: "text/markdown", text: lines.join("\n") }] };
 });
 /**
- * Resource: trae://recent
+ * Resource: gmem://recent
  *
- * Returns the 10 most recently added Trae-specific memories.
+ * Returns the 10 most recently added Gmem-specific memories.
  *
- * @returns Markdown list of recent Trae memories
+ * @returns Markdown list of recent Gmem memories
  */
-server.registerResource("trae-recent", "trae://recent", {
-    description: "The 10 most recently added Trae-specific memories, sorted by creation date.",
+server.registerResource("gmem-recent", "gmem://recent", {
+    description: "The 10 most recently added Gmem-specific memories, sorted by creation date.",
     mimeType: "text/markdown"
 }, async () => {
     const loaded = loadStore();
     const active = loaded.records
-        .filter(r => !r.deletedAt && r.tags.includes("trae"))
+        .filter(r => !r.deletedAt && r.tags.includes("gmem"))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 10);
     const lines = [];
-    lines.push("# Recent Trae Memories\n");
-    lines.push("Last 10 Trae memories added to the store.\n");
+    lines.push("# Recent Gmem Memories\n");
+    lines.push("Last 10 Gmem memories added to the store.\n");
     if (active.length === 0) {
-        lines.push("_No Trae memories stored yet._\n");
-        lines.push("Use `trae_write` to add your first Trae memory!");
+        lines.push("_No Gmem memories stored yet._\n");
+        lines.push("Use `gmem_write` to add your first Gmem memory!");
     }
     else {
         for (const r of active) {
@@ -387,7 +387,7 @@ server.registerResource("trae-recent", "trae://recent", {
             lines.push(`_ID: ${r.id}_\n`);
         }
     }
-    return { contents: [{ uri: "trae://recent", mimeType: "text/markdown", text: lines.join("\n") }] };
+    return { contents: [{ uri: "gmem://recent", mimeType: "text/markdown", text: lines.join("\n") }] };
 });
 // ─────────────────────────────────────────────────────────────
 // Server startup
@@ -435,9 +435,9 @@ async function main() {
         log(`配置参数覆盖: ${JSON.stringify(cliArgs)}`);
     }
     const transport = new StdioServerTransport();
-    log("Starting Trae MCP stdio server...");
+    log("Starting Gmem MCP stdio server...");
     await server.connect(transport);
-    log("Trae MCP server connected.");
+    log("Gmem MCP server connected.");
 }
 main().catch((err) => {
     log(`Fatal: ${err?.message || String(err)}`);
