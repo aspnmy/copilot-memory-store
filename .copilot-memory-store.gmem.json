@@ -1,0 +1,13 @@
+{
+  "projectName": "copilot-memory-store",
+  "memories": [
+    {
+      "id": "m_20260127T131000000Z_project",
+      "text": "这个项目使用TS严格模式开发，新增代码都必须用ESLint检查",
+      "tags": ["typescript", "strict", "eslint", "development", "preference"],
+      "keywords": ["ts", "typescript", "eslint", "strict"],
+      "createdAt": "2026-01-27T13:10:00.000+08:00",
+      "updatedAt": "2026-01-27T13:10:00.000+08:00"
+    }
+  ]
+}
