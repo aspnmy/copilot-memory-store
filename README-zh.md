@@ -195,6 +195,102 @@ npm run pkg:all:gcc
 
 有关命令和功能的详细文档，请查看 [Wiki](https://github.com/Tokio17/copilot-memory-store/wiki)。此资源包括示例和高级提示，以增强你的体验。
 
+## 🔄 记忆移植功能
+
+Copilot Memory Store 提供了完整的记忆移植功能，可以将记忆导出为多种格式，以便在其他模型/工具中使用。
+
+### 支持的导出格式
+
+1. **JSON 格式** - 完整的数据结构，适合程序处理
+2. **Markdown 格式** - 人类可读的文档格式
+3. **CSV 格式** - 表格数据，适合 Excel 等工具
+4. **纯文本格式** - 简单的文本格式
+5. **嵌入向量准备格式** - 用于 LLM 嵌入和语义搜索
+
+### 导出命令
+
+```bash
+# 导出为 JSON 格式（默认）
+npm run memory:export
+
+# 导出为 Markdown 格式
+npm run memory:export:md
+
+# 导出为 CSV 格式
+npm run memory:export:csv
+
+# 导出为纯文本格式
+npm run memory:export:text
+
+# 导出为嵌入向量准备格式
+npm run memory:export:embedding
+```
+
+### 导入命令
+
+```bash
+# 从默认文件导入
+npm run memory:import
+
+# 从指定文件导入
+npx tsx src/import-memories.ts path/to/export-file.json
+```
+
+### 使用场景
+
+#### 场景 1：备份记忆
+```bash
+# 导出所有记忆为 JSON 格式
+npm run memory:export
+```
+
+#### 场景 2：在不同环境间迁移
+```bash
+# 在源环境中导出
+npm run memory:export
+
+# 将导出文件复制到目标环境
+# 在目标环境中导入
+npm run memory:import
+```
+
+#### 场景 3：在其他 LLM 中使用
+```bash
+# 导出为嵌入向量准备格式
+npm run memory:export:embedding
+
+# 使用导出的文件进行 LLM 嵌入
+# 例如：使用 OpenAI Embeddings API
+```
+
+#### 场景 4：生成文档
+```bash
+# 导出为 Markdown 格式
+npm run memory:export:md
+
+# 将导出的 Markdown 文件添加到项目文档中
+```
+
+#### 场景 5：数据分析
+```bash
+# 导出为 CSV 格式
+npm run memory:export:csv
+
+# 在 Excel 或其他数据分析工具中打开 CSV 文件
+```
+
+### 最佳实践
+
+1. **定期备份**：定期导出记忆数据作为备份
+2. **版本控制**：将导出的记忆文件添加到版本控制系统
+3. **格式选择**：根据使用场景选择合适的导出格式
+4. **数据验证**：导入后验证数据的完整性和准确性
+5. **错误处理**：检查导入日志，确保所有记忆都被正确处理
+
+### 详细文档
+
+有关记忆移植功能的详细文档，请查看 [记忆移植指南](docs/MEMORY_MIGRATION_GUIDE.md)。
+
 ## 🤝 社区与支持
 
 加入我们的社区，提出问题，分享见解，了解更多关于上下文工程的信息。你可以通过以下渠道联系我们：
