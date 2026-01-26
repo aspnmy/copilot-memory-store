@@ -20,6 +20,10 @@
  * @see https://modelcontextprotocol.io/
  */
 
+import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
 import "dotenv/config";
 import process from "node:process";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -35,6 +39,39 @@ import { createConfigManager, Config } from "./config.js";
  */
 function log(msg: string): void {
   process.stderr.write(`[gmem-memory] ${msg}\n`);
+}
+
+/**
+ * Executes CLI command directly without entering interactive mode.
+ * @param args - CLI arguments to execute
+ * @returns Promise that resolves with command output
+ */
+async function executeCliCommand(args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const cliPath = path.join(__dirname, "..", "dist", "cli.js");
+  
+  return new Promise((resolve) => {
+    const child = spawn("node", [cliPath, ...args], {
+      cwd: process.cwd(),
+      env: process.env
+    });
+    
+    let stdout = "";
+    let stderr = "";
+    
+    child.stdout?.on("data", (data) => {
+      stdout += data.toString();
+    });
+    
+    child.stderr?.on("data", (data) => {
+      stderr += data.toString();
+    });
+    
+    child.on("close", (code) => {
+      resolve({ stdout, stderr, exitCode: code ?? 0 });
+    });
+  });
 }
 
 /**
@@ -118,12 +155,29 @@ server.registerTool(
       tags.push(args.gmemType.trim());
     }
 
-    const rec = await addMemory({ text, tags });
-    const tagInfo = rec.tags.length > 0 ? ` with tags [${rec.tags.join(", ")}]` : "";
+    // Build CLI command arguments
+    const cliArgs = ["add"];
+    if (tags.length > 0) {
+      cliArgs.push("--tags", tags.join(","));
+    }
+    cliArgs.push(text);
+
+    // Execute CLI command directly
+    const { stdout, stderr, exitCode } = await executeCliCommand(cliArgs);
+    
+    if (exitCode !== 0) {
+      return {
+        content: [{
+          type: "text",
+          text: `❌ Failed to save memory: ${stderr || stdout}`
+        }]
+      };
+    }
+
     return {
       content: [{
         type: "text",
-        text: `✓ Memory saved for Gmem (${rec.id})${tagInfo}\n\nKeywords extracted: ${rec.keywords.slice(0, 5).join(", ")}${rec.keywords.length > 5 ? "..." : ""}`
+        text: stdout || "✓ Memory saved successfully"
       }]
     };
   }
