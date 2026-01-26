@@ -106,6 +106,7 @@ Once you have installed the copilot-memory-store, follow these steps to begin us
 
 3. **Using the CLI:**
    - Type `copilot-memory-store help` to see available commands.
+   - You can also use `Gmem help` to access the CLI (Gmem is an alias for copilot-memory-store).
    - Use `add` to store new entries, `get` to retrieve them, and `delete` to remove any unwanted entries.
 
 4. **Accessing the MCP Server:**

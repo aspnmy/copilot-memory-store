@@ -167,6 +167,7 @@ npm run pkg:all:gcc
 
 3. **使用 CLI：**
    - 键入 `copilot-memory-store help` 查看可用命令。
+   - 使用 `Gmem help` 也可以访问 CLI（Gmem 是 copilot-memory-store 的别名）。
    - 使用 `add` 存储新条目，`get` 检索它们，`delete` 删除任何不需要的条目。
 
 4. **访问 MCP 服务器：**
