@@ -112,7 +112,7 @@ function exportToEmbeddingReady(records: MemoryRecord[]): string {
 /**
  * 主导出函数
  */
-async function exportMemories(format: ExportFormat = ExportFormat.JSON) {
+async function exportMemories(format: string = "json") {
   try {
     console.log("加载记忆数据...\n");
     
@@ -171,26 +171,26 @@ async function exportMemories(format: ExportFormat = ExportFormat.JSON) {
 
 // 从命令行参数获取导出格式
 const formatArg = process.argv[2]?.toLowerCase();
-let format: ExportFormat = ExportFormat.JSON;
+let format: string = "json";
 
 switch (formatArg) {
   case "json":
-    format = ExportFormat.JSON;
+    format = "json";
     break;
   case "markdown":
   case "md":
-    format = ExportFormat.MARKDOWN;
+    format = "markdown";
     break;
   case "csv":
-    format = ExportFormat.CSV;
+    format = "csv";
     break;
   case "text":
   case "txt":
-    format = ExportFormat.PLAIN_TEXT;
+    format = "plain_text";
     break;
   case "embedding":
   case "jsonl":
-    format = ExportFormat.EMBEDDING_READY;
+    format = "embedding_ready";
     break;
   default:
     console.log("用法: npx tsx src/migrate-memories.ts [格式]");
