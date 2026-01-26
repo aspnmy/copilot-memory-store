@@ -793,6 +793,13 @@ async function main() {
     if (Object.keys(cliArgs).length > 0) {
         const configManager = createConfigManager();
         configManager.override(cliArgs);
+        // 更新 process.env 以便 memoryStore.ts 中的函数能够使用覆盖后的配置
+        for (const key in cliArgs) {
+            const value = cliArgs[key];
+            if (value !== undefined) {
+                process.env[key] = value;
+            }
+        }
         log(`配置参数覆盖: ${JSON.stringify(cliArgs)}`);
     }
     const transport = new StdioServerTransport();
