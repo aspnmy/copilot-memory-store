@@ -25,9 +25,9 @@ import process from "node:process";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { addMemory, compressDeterministic, computeStats, exportJson, formatSearchResults, loadStore, purge, search, softDeleteById } from "./memoryStore.js";
+import { addMemory, computeStats, formatSearchResults, loadStore, search } from "./memoryStore.js";
 import { deepSeekCompress, deepSeekShape } from "./deepseek.js";
-import { createConfigManager, ConfigManager } from "./config.js";
+import { createConfigManager, Config } from "./config.js";
 
 /**
  * Logs a message to stderr (stdout is reserved for JSON-RPC).
@@ -468,7 +468,43 @@ server.registerResource(
  * Starts the MCP server with stdio transport.
  * Logs status to stderr since stdout is used for JSON-RPC.
  */
+
+/**
+ * 解析命令行参数
+ * 支持格式：--KEY=value 或 --KEY value
+ */
+function parseCommandLineArgs(): Partial<Config> {
+  const args: Partial<Config> = {};
+  const cliArgs = process.argv.slice(2);
+  
+  for (let i = 0; i < cliArgs.length; i++) {
+    const arg = cliArgs[i];
+    
+    // 支持 --KEY=value 格式
+    if (arg.startsWith("--") && arg.includes("=")) {
+      const [key, value] = arg.slice(2).split("=", 2);
+      args[key as keyof Config] = value;
+    }
+    // 支持 --KEY value 格式
+    else if (arg.startsWith("--") && i + 1 < cliArgs.length && !cliArgs[i + 1].startsWith("--")) {
+      const key = arg.slice(2);
+      args[key as keyof Config] = cliArgs[i + 1];
+      i++; // 跳过下一个参数，因为已经被使用了
+    }
+  }
+  
+  return args;
+}
+
 async function main(): Promise<void> {
+  // 解析命令行参数并覆盖配置
+  const cliArgs = parseCommandLineArgs();
+  if (Object.keys(cliArgs).length > 0) {
+    const configManager = createConfigManager();
+    configManager.override(cliArgs);
+    log(`配置参数覆盖: ${JSON.stringify(cliArgs)}`);
+  }
+  
   const transport = new StdioServerTransport();
   log("Starting Trae MCP stdio server...");
   await server.connect(transport);

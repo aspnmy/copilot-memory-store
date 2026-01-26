@@ -4,7 +4,7 @@ import process from "node:process";
 /**
  * 配置接口
  */
-interface Config {
+export interface Config {
   MEMORY_PATH?: string;
   MEMORY_LOCK_PATH?: string;
   DEEPSEEK_API_KEY?: string;
@@ -83,7 +83,7 @@ export class ConfigManager {
   /**
    * 获取内存锁路径
    */
-  public getMemoryLockPath(defaultPath?: string): string | undefined {
+  public getMemoryLockPath(): string | undefined {
     return this.config.MEMORY_LOCK_PATH?.trim();
   }
 

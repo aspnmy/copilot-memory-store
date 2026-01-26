@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { loadStore, addMemory } from "./memoryStore.js";
 import fs from "node:fs";
-import path from "node:path";
 
 async function importMemories(importPath: string) {
   try {

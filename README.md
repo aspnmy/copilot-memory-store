@@ -243,12 +243,12 @@ npm run backup:once
 
 Backup files use the following naming format:
 ```
-memory-backup-YYYY-MM-DDTHH-MM-SS-sssZ.<extension>
+memory-backup-YYYY-MM-DD_HH-MM-SS-sss.<extension>
 ```
 
 Example:
 ```
-memory-backup-2026-01-27T10-30-45-123Z.json
+memory-backup-2026-01-27_10-30-45-123.json
 ```
 
 **Detailed Documentation:**

@@ -350,6 +350,142 @@ npm run backup:once
 npm run backup:once
 ```
 
+### MCP 配置参数覆盖
+
+MCP 服务器支持通过命令行参数覆盖 `.env` 中的配置，这样可以在不同的 MCP 客户端配置中使用不同的设置。
+
+#### 配置方式
+
+在 MCP 配置文件（如 `mcp.json`）中使用 `args` 参数传递配置：
+
+```json
+{
+  "mcpServers": {
+    "trae-memory-store": {
+      "command": "V:\\git_data\\copilot-memory-store\\bin\\copilot-memory-trae.bat",
+      "args": [
+        "--MEMORY_PATH=custom.json",
+        "--BACKUP_FORMAT=markdown",
+        "--BACKUP_INTERVAL=7200000"
+      ]
+    }
+  }
+}
+```
+
+#### 支持的参数格式
+
+1. **--KEY=value 格式**：`--MEMORY_PATH=custom.json`
+2. **--KEY value 格式**：`--MEMORY_PATH custom.json`
+
+两种格式可以混合使用。
+
+#### 支持的配置项（所有 .env 配置）
+
+- `MEMORY_PATH`: 记忆文件路径
+- `MEMORY_LOCK_PATH`: 记忆锁文件路径
+- `DEEPSEEK_API_KEY`: DeepSeek API 密钥
+- `DEEPSEEK_BASE_URL`: DeepSeek API 基础 URL
+- `DEEPSEEK_MODEL`: DeepSeek 模型名称
+- `BACKUP_INTERVAL`: 备份间隔（毫秒）
+- `BACKUP_FORMAT`: 备份格式（json, markdown, csv, plain_text, embedding_ready）
+- `BACKUP_DIR`: 备份目录
+- `MAX_BACKUPS`: 最大备份数
+- `COMPRESS_BACKUPS`: 是否压缩备份（true/false）
+
+#### 使用示例
+
+**示例 1：覆盖记忆文件路径和备份格式**
+```json
+{
+  "mcpServers": {
+    "trae-memory-store": {
+      "command": "V:\\git_data\\copilot-memory-store\\bin\\copilot-memory-trae.bat",
+      "args": [
+        "--MEMORY_PATH=custom-memory.json",
+        "--BACKUP_FORMAT=markdown"
+      ]
+    }
+  }
+}
+```
+
+**示例 2：覆盖备份间隔和最大备份数**
+```json
+{
+  "mcpServers": {
+    "trae-memory-store": {
+      "command": "V:\\git_data\\copilot-memory-store\\bin\\copilot-memory-trae.bat",
+      "args": [
+        "--BACKUP_INTERVAL=7200000",
+        "--MAX_BACKUPS=20"
+      ]
+    }
+  }
+}
+```
+
+**示例 3：混合使用两种格式**
+```json
+{
+  "mcpServers": {
+    "trae-memory-store": {
+      "command": "V:\\git_data\\copilot-memory-store\\bin\\copilot-memory-trae.bat",
+      "args": [
+        "--MEMORY_PATH",
+        "custom.json",
+        "--BACKUP_FORMAT",
+        "csv"
+      ]
+    }
+  }
+}
+```
+
+**示例 4：覆盖 DeepSeek API 配置**
+```json
+{
+  "mcpServers": {
+    "trae-memory-store": {
+      "command": "V:\\git_data\\copilot-memory-store\\bin\\copilot-memory-trae.bat",
+      "args": [
+        "--DEEPSEEK_API_KEY=your-api-key",
+        "--DEEPSEEK_BASE_URL=https://api.deepseek.com",
+        "--DEEPSEEK_MODEL=deepseek-chat"
+      ]
+    }
+  }
+}
+```
+
+**示例 5：完整配置示例**
+```json
+{
+  "mcpServers": {
+    "trae-memory-store": {
+      "command": "V:\\git_data\\copilot-memory-store\\bin\\copilot-memory-trae.bat",
+      "args": [
+        "--MEMORY_PATH=custom.json",
+        "--BACKUP_FORMAT=markdown",
+        "--BACKUP_INTERVAL=7200000",
+        "--BACKUP_DIR=./custom-backups",
+        "--MAX_BACKUPS=20",
+        "--COMPRESS_BACKUPS=true",
+        "--DEEPSEEK_API_KEY=your-api-key",
+        "--DEEPSEEK_BASE_URL=https://api.deepseek.com",
+        "--DEEPSEEK_MODEL=deepseek-chat"
+      ]
+    }
+  }
+}
+```
+
+#### 配置覆盖规则
+
+- 配置参数中存在与 `.env` 中同名参数则配置参数为准
+- 不存在同名参数则使用 `.env` 中的配置
+- 所有参数都是可选的，可以只覆盖需要的配置项
+
 ### 详细文档
 
 有关记忆移植功能的详细文档，请查看 [记忆移植指南](docs/MEMORY_MIGRATION_GUIDE.md)。

@@ -19,17 +19,6 @@ type MemoryRecord = {
 };
 
 /**
- * 导出格式枚举
- */
-enum ExportFormat {
-  JSON = "json",
-  MARKDOWN = "markdown",
-  CSV = "csv",
-  PLAIN_TEXT = "plain_text",
-  EMBEDDING_READY = "embedding_ready"
-}
-
-/**
  * 导出为 JSON 格式
  */
 function exportToJson(records: MemoryRecord[]): string {
@@ -138,23 +127,23 @@ async function exportMemories(format: ExportFormat = ExportFormat.JSON) {
     let extension: string;
     
     switch (format) {
-      case ExportFormat.JSON:
+      case "json":
         content = exportToJson(activeRecords);
         extension = "json";
         break;
-      case ExportFormat.MARKDOWN:
+      case "markdown":
         content = exportToMarkdown(activeRecords);
         extension = "md";
         break;
-      case ExportFormat.CSV:
+      case "csv":
         content = exportToCsv(activeRecords);
         extension = "csv";
         break;
-      case ExportFormat.PLAIN_TEXT:
+      case "plain_text":
         content = exportToPlainText(activeRecords);
         extension = "txt";
         break;
-      case ExportFormat.EMBEDDING_READY:
+      case "embedding_ready":
         content = exportToEmbeddingReady(activeRecords);
         extension = "jsonl";
         break;
