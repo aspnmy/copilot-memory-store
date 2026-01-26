@@ -12,7 +12,7 @@ coverage/
 tmp/
 temp/
 *.tsbuildinfo
-
+bin/
 ############################
 # Environment files
 ############################
@@ -43,6 +43,12 @@ Thumbs.db
 .cortext-memory.lock
 .copilot-memory.json
 .copilot-memory.lock
+.trae/
+memories-export-*.json
+memories-export-*.md
+memories-export-*.csv
+memories-export-*.txt
+memories-export-*.jsonl
 
 ############################
 # Shared editor configuration to keep
