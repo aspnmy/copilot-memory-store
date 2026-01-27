@@ -1,0 +1,6 @@
+/target
+**/*.rs.bk
+*.pdb
+Cargo.lock
+.copilot-memory.json
+.copilot-memory.lock
