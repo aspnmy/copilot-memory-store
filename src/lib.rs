@@ -5,6 +5,8 @@ pub mod lock;
 pub mod store;
 pub mod compress;
 pub mod cli;
+pub mod config;
+pub mod logs;
 
 pub use record::{MemoryRecord, StoreStats, SearchHit, CompressResult};
 pub use timestamp::{now_iso, make_id};
@@ -15,3 +17,5 @@ pub use compress::compress_deterministic;
 #[cfg(feature = "llm")]
 pub use compress::compress_with_llm;
 pub use cli::{parse, run_repl};
+pub use config::{Config, load_config, get_config_file_path};
+pub use logs::{init_global_logger, LogConfig, LogLevel, debug, info, warn, error};

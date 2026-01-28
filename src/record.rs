@@ -13,10 +13,13 @@ pub struct MemoryRecord {
     /// 自动提取的关键词用于改进搜索
     pub keywords: Vec<String>,
     /// 记忆创建时的 ISO 时间戳
+    #[serde(alias = "createdAt")]
     pub created_at: String,
     /// 记忆最后修改时的 ISO 时间戳
+    #[serde(alias = "updatedAt")]
     pub updated_at: String,
     /// 如果软删除则为 ISO 时间戳，否则为 null
+    #[serde(alias = "deletedAt")]
     pub deleted_at: Option<String>,
 }
 

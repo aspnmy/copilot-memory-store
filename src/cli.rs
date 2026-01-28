@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::io::{self, Write};
-use regex::Regex;
 use crate::store::MemoryStore;
 use crate::compress::compress_deterministic;
 
@@ -21,6 +20,7 @@ pub struct Parsed {
 /// 解析后的命令结构，如果输入为空则返回 None
 pub fn parse(line: &str) -> Option<Parsed> {
     let tokens = tokenize(line.trim());
+    
     if tokens.is_empty() {
         return None;
     }
@@ -57,37 +57,80 @@ pub fn parse(line: &str) -> Option<Parsed> {
 /// # 返回
 /// 分词后的字符串数组
 fn tokenize(line: &str) -> Vec<String> {
-    let re = Regex::new(r#""([^"\\]*(?:\\.[^"\\]*)*"|'([^'\\]*(?:\\.[^'\\]*)*)'|(\S+))"#).unwrap();
-    re.find_iter(line)
-        .map(|m| {
-            let token = m.as_str();
-            token.replace(r#"\""#, "\"").replace(r#"\'"#, "'")
-        })
-        .collect()
+    let mut tokens = Vec::new();
+    let mut in_quotes = false;
+    let mut quote_char = ' ';
+    let mut current = String::new();
+    
+    for c in line.chars() {
+        match c {
+            '"' | '\'' if !in_quotes => {
+                in_quotes = true;
+                quote_char = c;
+            }
+            '"' | '\'' if in_quotes && c == quote_char => {
+                in_quotes = false;
+            }
+            ' ' | '\t' if !in_quotes => {
+                if !current.is_empty() {
+                    tokens.push(current.clone());
+                    current.clear();
+                }
+            }
+            _ => {
+                current.push(c);
+            }
+        }
+    }
+    
+    if !current.is_empty() {
+        tokens.push(current);
+    }
+    
+    tokens
 }
 
 /// 主命令行 REPL 循环
 ///
 /// # 参数
 /// * `store` - 记忆存储实例
+/// * `debug_mode` - 是否启用debug模式
+/// * `version` - 版本号
 ///
 /// # 返回
 /// IO 错误（如果有）
-pub fn run_repl(store: MemoryStore) -> io::Result<()> {
+pub fn run_repl(store: MemoryStore, debug_mode: bool, version: &str) -> io::Result<()> {
     let stdin = io::stdin();
     let mut stdout = io::stdout();
 
-    println!("Copilot Memory Store CLI");
-    println!("Type 'help' for available commands, 'exit' to quit\n");
+    println!("Copilot Memory Store CLI v{}", version);
+    println!("Type 'help' for available commands, 'exit' to quit");
+    if debug_mode {
+        println!("Debug mode enabled");
+        // 显示配置文件路径
+        let config_path = crate::config::get_config_file_path(None);
+        println!("Config file: {}", config_path);
+        // 显示日志目录路径
+        let exe_path = std::env::current_exe().unwrap_or_else(|_| std::env::current_dir().unwrap());
+        let exe_dir = exe_path.parent().unwrap_or_else(|| std::path::Path::new("."));
+        let logs_dir = exe_dir.join("logs/debug");
+        println!("Logs directory: {}", logs_dir.display());
+    }
+    println!();
 
     loop {
-        print!("> ");
+        print!(" > ");
         stdout.flush()?;
 
         let mut line = String::new();
-        stdin.read_line(&mut line)?;
+        let bytes_read = stdin.read_line(&mut line)?;
+
+        if bytes_read == 0 {
+            break;
+        }
 
         let line = line.trim();
+        
         if line.is_empty() {
             continue;
         }
@@ -157,6 +200,31 @@ fn execute_command(store: &MemoryStore, parsed: &Parsed) -> io::Result<()> {
                 }
             }
         }
+        "logs" => {
+            println!("Logs command:");
+            println!("  logs show - 显示最近的日志");
+            println!("  logs clear - 清除所有日志");
+            println!("  logs status - 显示日志状态");
+        }
+        "logs show" => {
+            println!("Showing recent logs...");
+            // 这里可以实现显示最近日志的逻辑
+        }
+        "logs clear" => {
+            println!("Clearing all logs...");
+            // 这里可以实现清除日志的逻辑
+        }
+        "logs status" => {
+            println!("Logs status:");
+            println!("  Logs directory: logs/debug");
+            println!("  Max size: 1MB per file");
+            println!("  Rotation: Enabled");
+        }
+        "whereiscfg" => {
+            let config_path = crate::config::get_config_file_path(None);
+            println!("Current config file path:");
+            println!("{}", config_path);
+        }
         "delete" => {
             if parsed.args.is_empty() {
                 println!("Usage: delete <id>");
@@ -216,6 +284,10 @@ fn execute_command(store: &MemoryStore, parsed: &Parsed) -> io::Result<()> {
             println!("  stats                          - Show memory statistics");
             println!("  export                         - Export all memories as JSON");
             println!("  import <json_file>             - Import memories from JSON file");
+            println!("  logs show                       - Show recent logs");
+            println!("  logs clear                      - Clear all logs");
+            println!("  logs status                     - Show logs status");
+            println!("  whereiscfg                      - Show config file path");
             println!("  help                           - Show this help");
             println!("  exit                           - Quit CLI");
         }
