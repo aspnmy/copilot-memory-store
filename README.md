@@ -1,6 +1,19 @@
-# GmemoryStore
+# GmemoryStore 
 
-Rust 实现的高性能、类型安全的 Copilot Memory Store 记忆存储服务。
+- Rust 实现的高性能、类型安全的 Copilot Memory Store 记忆存储服务。
+- gmem_rust_memory_store分支更名成 gmem-worker 独立维护。https://github.com/aspnmy/gmem-worker
+
+# GmemWorker
+- GmemWorker 项目
+一个简单的 AI 开发边界框架，通过全局记忆管理系统，显著消除 AI 助手的幻觉、关注偏移、上下文遗忘等问题，让 AI 开发更高效、更可靠。
+
+- 🎯 项目定位
+GmemWorker 是一个专为 AI 助手设计的开发边界框架，通过 GmemoryStore 全局记忆工具，实现：
+
+全局记忆：存储跨项目的通用规则、编码规范和最佳实践
+项目独有记忆：记录特定项目的需求、架构和约定
+AI 开发指导：为 AI 助手提供准确的上下文和规范指导
+开发效率提升：显著减少 AI 幻觉，提高代码质量和开发速度
 
 ## 项目简介
 
